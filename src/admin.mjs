@@ -4,32 +4,18 @@ import { Database, Resource } from "@adminjs/sequelize";
 import Product from "./data/models/product.js";
 import Category from "./data/models/category.js";
 import Consult from "./data/models/consult.js";
-import path from "path";
-import fs from "fs";
-import { fileURLToPath } from "url";
+import Order from "./data/models/order.js";
+import Cart from "./data/models/cart.js";
 import dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
+import uploadFeature from "@adminjs/upload";
 
 dotenv.config();
 AdminJS.registerAdapter({ Database, Resource });
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
-// Create upload directory if it does not exist
-const publicFolderPath = path.join(__dirname, "public");
-const imagesFolderPath = path.join(publicFolderPath, "images");
-
-if (!fs.existsSync(publicFolderPath)) {
-  fs.mkdirSync(publicFolderPath);
-  console.log("Public folder created successfully.");
-}
-
-if (!fs.existsSync(imagesFolderPath)) {
-  fs.mkdirSync(imagesFolderPath);
-  console.log("Images folder created successfully.");
-}
-
-// Step 1: Initialize ComponentLoader
 
 const adminJs = new AdminJS({
   resources: [
@@ -49,26 +35,30 @@ const adminJs = new AdminJS({
           id: {
             isVisible: { list: true, edit: false, filter: true, show: true },
           },
-          title: {
-            isVisible: { list: true, edit: true, filter: true, show: true },
-          },
-          subtitle: {
-            isVisible: { list: true, edit: true, filter: true, show: true },
-          },
-          image: {
-            components: {},
-          },
-          cost: {
-            isVisible: { list: true, edit: true, filter: true, show: true },
-          },
-          description: {
-            isVisible: { list: true, edit: true, filter: true, show: true },
-          },
-          category_id: {
-            isVisible: { list: true, edit: true, filter: true, show: true },
-          },
+          title: { isVisible: true },
+          subtitle: { isVisible: true },
+          image: { isVisible: true },
+          cost: { isVisible: true },
+          description: { isVisible: true },
+          category_id: { isVisible: true },
         },
       },
+      features: [
+        uploadFeature({
+          provider: {
+            local: {
+              bucket: path.join(__dirname, "public/images"), // Yuklangan fayllarni saqlash papkasi
+            },
+          },
+          properties: {
+            key: "image", // Fayl yo'li saqlanadigan ustun
+            file: "uploadImage", // Fayl yuklash uchun forma maydoni
+          },
+          validation: {
+            mimeTypes: ["image/jpeg", "image/png"], // Faqat JPG va PNG fayllar yuklanadi
+          },
+        }),
+      ],
     },
     {
       resource: Category,
@@ -91,15 +81,45 @@ const adminJs = new AdminJS({
           id: {
             isVisible: { list: true, edit: false, filter: true, show: true },
           },
-          name: {
+          name: { isVisible: true },
+          phone: { isVisible: true },
+          question: { isVisible: true },
+        },
+      },
+    },
+    {
+      resource: Order,
+      options: {
+        listProperties: [
+          "id",
+          "name",
+          "phone",
+          "email",
+          "product_id",
+          "quantity",
+        ],
+        properties: {
+          id: {
             isVisible: { list: true, edit: false, filter: true, show: true },
           },
-          phone: {
+          name: { isVisible: true },
+          phone: { isVisible: true },
+          email: { isVisible: true },
+          product_id: { isVisible: true },
+          quantity: { isVisible: true },
+        },
+      },
+    },
+    {
+      resource: Cart,
+      options: {
+        listProperties: ["id", "product_id", "added_time"],
+        properties: {
+          id: {
             isVisible: { list: true, edit: false, filter: true, show: true },
           },
-          question: {
-            isVisible: { list: true, edit: false, filter: true, show: true },
-          },
+          product_id: { isVisible: true },
+          added_time: { isVisible: true, type: "date" },
         },
       },
     },
@@ -111,6 +131,7 @@ const adminJs = new AdminJS({
   },
 });
 
+// AdminJS routerini yaratish
 const adminRouter = AdminJSExpress.buildRouter(adminJs);
 
 export { adminJs, adminRouter };

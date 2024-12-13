@@ -1,6 +1,7 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../../config/dbconfig");
 const Product = require("./product");
+const moment = require("moment");
 
 const Cart = sequelize.define(
   "cart",
@@ -17,6 +18,10 @@ const Cart = sequelize.define(
     added_time: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
+      get() {
+        const rawValue = this.getDataValue("added_time");
+        return moment(rawValue).format("YYYY-MM-DD HH:mm:ss");
+      },
     },
   },
   {

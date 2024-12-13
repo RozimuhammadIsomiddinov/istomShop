@@ -9,11 +9,11 @@ const Category = sequelize.define(
       autoIncrement: true,
       primaryKey: true,
     },
-    //name for products
     name: {
       type: DataTypes.STRING,
       allowNull: false,
     },
+    image: { type: DataTypes.STRING },
     description: {
       type: DataTypes.TEXT,
     },

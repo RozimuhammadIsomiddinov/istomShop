@@ -9,15 +9,19 @@ const postProduct = async (req, res) => {
       cost,
       description,
       category_id,
-      isAdmin,
       isdiscount,
       newcost,
     } = req.body;
 
-    if (!isAdmin) return res.status(400).json({ message: "You're not admin" });
-
-    if (!title || !subtitle || !cost || !description || !category_id)
-      return res.status(404).json({ message: "You have to fill all fields" });
+    if (
+      !title?.trim() ||
+      !subtitle?.trim() ||
+      !cost ||
+      !description?.trim() ||
+      !category_id
+    ) {
+      return res.status(400).json({ message: "You have to fill all fields" });
+    }
 
     const categoryId = await Category.findByPk(category_id);
     if (!categoryId)
@@ -33,7 +37,7 @@ const postProduct = async (req, res) => {
       (file) => `${process.env.BACKEND_URL}/${file?.filename}`
     );
 
-    if (isdiscount && (!newcost || newcost >= cost)) {
+    if (isdiscount == "true" && (!newcost || newcost >= cost)) {
       return res.status(400).json({
         message:
           "Invalid discount or new price must be less than the original price",
@@ -51,9 +55,12 @@ const postProduct = async (req, res) => {
       newcost: isdiscount ? newcost : null,
     });
 
-    res.status(201).json({ message: "Product successfully added", newProduct });
+    res.status(201).json({
+      message: "Product successfully added",
+      newProduct,
+    });
   } catch (err) {
-    res.status(400).json({
+    res.status(500).json({
       message: "Error from postProduct controller",
       error: err.message,
     });

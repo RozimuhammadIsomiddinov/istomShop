@@ -5,7 +5,7 @@ const postConsult = async (req, res) => {
     const { name, phone, question } = req.body;
     if (!name || !phone || !question)
       return res.status(400).json({ message: "you have to fill all field" });
-    const result = await Consult.create({
+    await Consult.create({
       name,
       phone,
       question,

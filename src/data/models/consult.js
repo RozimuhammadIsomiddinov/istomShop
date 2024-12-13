@@ -11,8 +11,6 @@ const Consult = sequelize.define(
   },
   {
     tableName: "consult",
-    createdAt: "created_at",
-    updatedAt: "updated_at",
     timestamps: true,
   }
 );
