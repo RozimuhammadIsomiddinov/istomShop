@@ -43,22 +43,6 @@ const adminJs = new AdminJS({
           category_id: { isVisible: true },
         },
       },
-      features: [
-        uploadFeature({
-          provider: {
-            local: {
-              bucket: path.join(__dirname, "public/images"), // Yuklangan fayllarni saqlash papkasi
-            },
-          },
-          properties: {
-            key: "image", // Fayl yo'li saqlanadigan ustun
-            file: "uploadImage", // Fayl yuklash uchun forma maydoni
-          },
-          validation: {
-            mimeTypes: ["image/jpeg", "image/png"], // Faqat JPG va PNG fayllar yuklanadi
-          },
-        }),
-      ],
     },
     {
       resource: Category,
